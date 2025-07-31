@@ -1,6 +1,7 @@
 import { AxiosResponse } from "axios";
 import { request } from "./client";
 import {
+	BHAPIError,
 	Clan,
 	GloryData,
 	PlayerRanked,
@@ -69,7 +70,11 @@ export const getBHIDFromName = async (name: string): Promise<number> => {
 	});
 
 	if (res.data.length === 0)
-		throw new Error(`Player with name "${name}" not found.`);
+		throw new BHAPIError(`Player with name "${name}" not found.`, {
+			code: res.statusText,
+			status: res.status,
+			details: res.config.url,
+		});
 
 	return res.data[0].brawlhalla_id;
 };
@@ -108,13 +113,16 @@ export const getLegendByName = async (
 	const getAllLegendsResponse = await getAllLegends();
 	const legends = getAllLegendsResponse.data;
 
-	if (!legends || !legends.length) throw new Error("No legends found.");
-
 	const legend = legends.find(
 		(legend) => legend.legend_name_key.toLowerCase() === name.toLowerCase(),
 	);
 
-	if (!legend) throw new Error(`Legend with name "${name}" not found.`);
+	if (!legend)
+		throw new BHAPIError(`Legend with name "${name}" not found.`, {
+			code: "LegendNotFound",
+			status: 404,
+			details: `No legend found with name "${name}"`,
+		});
 
 	return getLegendByID(legend.legend_id);
 };
@@ -123,11 +131,6 @@ export const getGloryByBHID = async (
 	brawlhallaId: number,
 ): Promise<GloryData> => {
 	const res = await getRankedByBHID(brawlhallaId);
-
-	if (!res || !res.data)
-		throw new Error(
-			`No ranked data found for Brawlhalla ID: ${brawlhallaId}`,
-		);
 
 	let { games, wins } = res.data;
 	if (res.data["2v2"] && res.data["2v2"].length > 0)

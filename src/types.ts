@@ -256,3 +256,27 @@ export type RankedRegion =
 	| "JPN";
 
 export type RankingTypes = "1v1" | "2v2" | "seasonal";
+
+export class BHAPIError<T> extends Error {
+	code: string;
+	status: number;
+	details: T;
+
+	constructor(
+		message: string,
+		options: {
+			code: string;
+			status: number;
+			details: T;
+		},
+	) {
+		super(message);
+
+		this.name = "ApiError";
+		this.code = options.code;
+		this.status = options.status;
+		this.details = options.details;
+
+		Object.setPrototypeOf(this, new.target.prototype);
+	}
+}

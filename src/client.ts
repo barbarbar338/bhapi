@@ -4,6 +4,7 @@ import axios, {
 	AxiosRequestConfig,
 	AxiosResponse,
 } from "axios";
+import { BHAPIError } from "./types";
 
 export type QueueItem = {
 	config: AxiosRequestConfig;
@@ -19,11 +20,12 @@ export type CustomError = Error & {
 
 let API_KEY: string | null = null;
 const MAX_CALLS_PER_SECOND = 10;
+const MAX_QUEUE_LENGTH = 500;
 
 let requestQueue: QueueItem[] = [];
 let activeRequests = 0;
 
-const apiClient: AxiosInstance = axios.create({
+export const apiClient: AxiosInstance = axios.create({
 	baseURL: "https://api.brawlhalla.com/",
 	timeout: 10000,
 	headers: {
@@ -33,8 +35,13 @@ const apiClient: AxiosInstance = axios.create({
 
 apiClient.interceptors.request.use((config) => {
 	if (!API_KEY) {
-		throw new Error(
+		throw new BHAPIError(
 			'API key not set. Call setApiKey("YOUR_KEY") before making requests.',
+			{
+				code: "API_KEY_NOT_SET",
+				status: 400,
+				details: "API key is required for making requests.",
+			},
 		);
 	}
 
@@ -56,17 +63,24 @@ apiClient.interceptors.response.use(
 			);
 			const retryAfterMs = retryAfter * 1000;
 
-			const customError = new Error(
+			throw new BHAPIError(
 				`Rate limit exceeded. Retry after ${retryAfter} seconds`,
-			) as CustomError;
-
-			customError.retryAfterMs = retryAfterMs;
-			customError.isRateLimitError = true;
-
-			return Promise.reject(customError);
+				{
+					code: error.response.statusText,
+					status: error.response.status,
+					details: {
+						retryAfterMs,
+						isRateLimitError: true,
+					},
+				},
+			);
 		}
 
-		return Promise.reject(error);
+		throw new BHAPIError(error.message, {
+			code: error.response?.statusText || "Unknown Error",
+			status: error.response?.status || 500,
+			details: error.config?.url,
+		});
 	},
 );
 
@@ -86,12 +100,21 @@ setInterval(() => {
 	}
 }, 100);
 
-const queuedRequest = (
+const queuedRequest = <T>(
 	path: string,
 	config: AxiosRequestConfig,
-): Promise<AxiosResponse> =>
+): Promise<AxiosResponse<T>> =>
 	new Promise((resolve, reject) => {
-		requestQueue.push({ config, path, resolve, reject });
+		if (requestQueue.length >= MAX_QUEUE_LENGTH)
+			reject(
+				new BHAPIError("Request queue overflow", {
+					code: "QUEUE_OVERFLOW",
+					status: 503,
+					details:
+						"The request queue has reached its maximum length.",
+				}),
+			);
+		else requestQueue.push({ config, path, resolve, reject });
 	});
 
 export function setApiKey(key: string) {
@@ -102,22 +125,14 @@ export function setApiKey(key: string) {
 
 export const request = {
 	get: <T>(path: string, config?: AxiosRequestConfig) =>
-		queuedRequest(path, { method: "get", ...config }) as Promise<
-			AxiosResponse<T>
-		>,
+		queuedRequest<T>(path, { method: "get", ...config }),
 
 	post: <T>(path: string, data?: any, config?: AxiosRequestConfig) =>
-		queuedRequest(path, { method: "post", data, ...config }) as Promise<
-			AxiosResponse<T>
-		>,
+		queuedRequest<T>(path, { method: "post", data, ...config }),
 
 	put: <T>(path: string, data?: any, config?: AxiosRequestConfig) =>
-		queuedRequest(path, { method: "put", data, ...config }) as Promise<
-			AxiosResponse<T>
-		>,
+		queuedRequest<T>(path, { method: "put", data, ...config }),
 
 	delete: <T>(path: string, config?: AxiosRequestConfig) =>
-		queuedRequest(path, { method: "delete", ...config }) as Promise<
-			AxiosResponse<T>
-		>,
+		queuedRequest<T>(path, { method: "delete", ...config }),
 };

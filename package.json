@@ -17,7 +17,7 @@
 		"taze": "^19.1.0",
 		"ts-node": "^10.9.2",
 		"tslib": "^2.8.1",
-		"typescript": "^5.8.3"
+		"typescript": "^5.9.2"
 	},
 	"keywords": [
 		"rest",
@@ -44,5 +44,5 @@
 		"update": "taze latest -w"
 	},
 	"types": "dist",
-	"version": "1.0.1"
+	"version": "1.1.0"
 }

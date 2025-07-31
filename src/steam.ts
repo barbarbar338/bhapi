@@ -2,7 +2,7 @@ import axios from "axios";
 import { parseStringPromise } from "xml2js";
 import { getGloryByBHID, getRankedByBHID, getStatsByBHID } from "./brawlhalla";
 import { request } from "./client";
-import { PlayerStats, SteamData } from "./types";
+import { BHAPIError, PlayerStats, SteamData } from "./types";
 
 const steamURLRegex =
 	/^https?:\/\/steamcommunity\.com\/(id|profiles)\/[a-zA-Z0-9_-]+\/?$/;
@@ -11,7 +11,11 @@ const validateURL = (url: string) => steamURLRegex.test(url);
 
 const getSteamData = async (url: string): Promise<SteamData> => {
 	if (!validateURL(url))
-		throw new Error("Not a valid Steam profile URL: " + url);
+		throw new BHAPIError("Not a valid Steam profile URL: " + url, {
+			code: "InvalidSteamURL",
+			status: 400,
+			details: `The provided URL "${url}" does not match the expected Steam profile format.`,
+		});
 
 	const xml = await axios
 		.get(url, {
@@ -19,14 +23,27 @@ const getSteamData = async (url: string): Promise<SteamData> => {
 		})
 		.then((r) => {
 			if (r.status > 199 && r.status < 300) return r.data as string;
-			else throw new Error("Not a valid Steam profile URL: " + url);
+			else
+				throw new BHAPIError("Not a valid Steam profile URL: " + url, {
+					code: "InvalidSteamURL",
+					status: 400,
+					details: `The provided URL "${url}" does not match the expected Steam profile format.`,
+				});
 		})
 		.catch(() => {
-			throw new Error("Not a valid Steam profile URL: " + url);
+			throw new BHAPIError("Not a valid Steam profile URL: " + url, {
+				code: "InvalidSteamURL",
+				status: 400,
+				details: `The provided URL "${url}" does not match the expected Steam profile format.`,
+			});
 		});
 
 	const result = (await parseStringPromise(xml).catch(() => {
-		throw new Error("Not a valid Steam profile URL: " + url);
+		throw new BHAPIError("Not a valid Steam profile URL: " + url, {
+			code: "InvalidSteamURL",
+			status: 400,
+			details: `The provided URL "${url}" does not match the expected Steam profile format.`,
+		});
 	})) as {
 		profile: {
 			steamID: string[];
@@ -42,7 +59,12 @@ const getSteamData = async (url: string): Promise<SteamData> => {
 				"https://steamcommunity.com/profiles/" +
 				result.profile.steamID64[0],
 		};
-	else throw new Error("Not a valid Steam profile URL: " + url);
+	else
+		throw new BHAPIError("Not a valid Steam profile URL: " + url, {
+			code: "InvalidSteamURL",
+			status: 400,
+			details: `The provided URL "${url}" does not match the expected Steam profile format.`,
+		});
 };
 
 export const getSteamDataByURL = async (
@@ -61,8 +83,12 @@ export const getBHIDFromSteamID = async (steamID: string): Promise<number> => {
 		},
 	});
 
-	if (!data || data.length === 0)
-		throw new Error("No player found with this Steam ID: " + steamID);
+	if (data.length === 0)
+		throw new BHAPIError("No player found with this Steam ID: " + steamID, {
+			code: "PlayerNotFound",
+			status: 404,
+			details: `No player found with Steam ID "${steamID}"`,
+		});
 
 	return data[0].brawlhalla_id;
 };
