@@ -1,0 +1,44 @@
+{
+	"author": {
+		"email": "hi@338.rocks",
+		"name": "Barış DEMİRCİ",
+		"url": "https://338.rocks"
+	},
+	"dependencies": {
+		"axios": "^1.11.0"
+	},
+	"description": "Brawlhalla API wrapper for NodeJS and web",
+	"devDependencies": {
+		"@types/node": "^24.1.0",
+		"prettier": "^3.6.2",
+		"rimraf": "^6.0.1",
+		"taze": "^19.1.0",
+		"typescript": "^5.8.3"
+	},
+	"keywords": [
+		"rest",
+		"api",
+		"wrapper",
+		"brawlhalla",
+		"bh",
+		"bhapi",
+		"brawl"
+	],
+	"license": "MIT",
+	"main": "dist",
+	"name": "bhapi",
+	"private": false,
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/barbarbar338/bhapi.git"
+	},
+	"scripts": {
+		"build": "tsc",
+		"format": "prettier -w .",
+		"prebuild": "rimraf dist",
+		"update": "taze latest -w"
+	},
+	"type": "module",
+	"types": "dist",
+	"version": "1.0.0"
+}
