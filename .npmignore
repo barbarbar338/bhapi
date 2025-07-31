@@ -1,0 +1,8 @@
+node_modules
+src
+.gitignore
+.npmignore
+.prettierrc
+yarn.lock
+tsconfig.json
+*.tsbuildinfo*
