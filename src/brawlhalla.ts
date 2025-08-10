@@ -135,7 +135,7 @@ export const getClanByID = (clanID: number): Promise<AxiosResponse<Clan>> =>
  */
 export const getAllLegends = async (): Promise<
 	AxiosResponse<StaticAllLegends[]>
-> => request.get<StaticAllLegends[]>("legends/all");
+> => request.get<StaticAllLegends[]>("legend/all");
 
 /**
  * Get legend by ID
@@ -146,7 +146,7 @@ export const getAllLegends = async (): Promise<
 export const getLegendByID = async (
 	legendID: number,
 ): Promise<AxiosResponse<StaticLegend>> =>
-	request.get<StaticLegend>(`legends/${legendID}`);
+	request.get<StaticLegend>(`legend/${legendID}`);
 
 /**
  * Get legend by name
