@@ -21,6 +21,8 @@
     <a href="https://github.com/barbarbar338/bhapi/issues">Request Feature</a>
     ·
     <a href="https://bhapi.338.rocks">Live Example</a>
+    ·
+    <a href="https://barbarbar338.github.io/bhapi">Docs</a>
   </p>
 </p>
 
@@ -32,6 +34,8 @@ Brawlhalla API JavaScript/TypeScript/NodeJS wrapper. Easily make API requests to
 - Using npm: `npm i @barbarbar338/bhapi`
 
 ## 🤓 Usage
+
+See [the documentation](https://barbarbar338.github.io/bhapi) for more examples.
 
 ```js
 import { BHAPIError, getStatsByBHID, setApiKey } from "@barbarbar338/bhapi";

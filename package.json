@@ -20,6 +20,7 @@
 		"typedoc": "^0.28.9",
 		"typescript": "^5.9.2"
 	},
+	"homepage": "https://barbarbar338.github.io/bhapi/",
 	"keywords": [
 		"rest",
 		"api",
