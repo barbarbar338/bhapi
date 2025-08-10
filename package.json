@@ -10,13 +10,14 @@
 	},
 	"description": "Brawlhalla API wrapper for NodeJS and web",
 	"devDependencies": {
-		"@types/node": "^24.1.0",
+		"@types/node": "^24.2.1",
 		"@types/xml2js": "^0.4.14",
 		"prettier": "^3.6.2",
 		"rimraf": "^6.0.1",
 		"taze": "^19.1.0",
 		"ts-node": "^10.9.2",
 		"tslib": "^2.8.1",
+		"typedoc": "^0.28.9",
 		"typescript": "^5.9.2"
 	},
 	"keywords": [
@@ -37,12 +38,12 @@
 		"url": "git+https://github.com/barbarbar338/bhapi.git"
 	},
 	"scripts": {
-		"build": "tsc",
+		"build": "tsc && typedoc src/index.ts",
 		"format": "prettier -w .",
-		"prebuild": "rimraf dist",
+		"prebuild": "rimraf dist && rimraf docs",
 		"start": "ts-node src",
 		"update": "taze latest -w"
 	},
 	"types": "dist",
-	"version": "1.1.0"
+	"version": "1.1.1"
 }

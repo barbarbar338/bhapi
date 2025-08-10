@@ -1,3 +1,17 @@
+import { AxiosRequestConfig, AxiosResponse } from "axios";
+
+export type QueueItem = {
+	config: AxiosRequestConfig;
+	path: string;
+	resolve: (value: AxiosResponse) => void;
+	reject: (reason?: any) => void;
+};
+
+export type CustomError = Error & {
+	retryAfterMs: number;
+	isRateLimitError: boolean;
+};
+
 export type SteamData = {
 	name: string;
 	steam_id: string;

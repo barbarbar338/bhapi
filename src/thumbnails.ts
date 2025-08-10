@@ -1,3 +1,6 @@
+/**
+ * Thumbnails for Brawlhalla legends
+ */
 export const thumbnails = {
 	bodvar: "https://cms.brawlhalla.com/c/uploads/2021/07/bodvar.png",
 	cassidy: "https://cms.brawlhalla.com/c/uploads/2021/07/cassidy.png",

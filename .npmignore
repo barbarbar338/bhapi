@@ -6,3 +6,5 @@ src
 yarn.lock
 tsconfig.json
 *.tsbuildinfo*
+docs
+.prettierignore

@@ -62,6 +62,12 @@ const newEloFromOldElo = (elo: number) => {
 	return elo;
 };
 
+/**
+ * Get Brawlhalla ID from player name
+ *
+ * @param {string} name Player name
+ * @returns {number} Brawlhalla ID of the player
+ */
 export const getBHIDFromName = async (name: string): Promise<number> => {
 	const res = await request.get<PlayerStats[]>("rankings/1v1/all/1", {
 		params: {
@@ -79,34 +85,75 @@ export const getBHIDFromName = async (name: string): Promise<number> => {
 	return res.data[0].brawlhalla_id;
 };
 
+/**
+ * Get player stats by Brawlhalla ID
+ *
+ * @param {number} brawlhallaId Brawlhalla ID of the player
+ * @returns {Promise<AxiosResponse<PlayerStats>>} Player stats
+ */
 export const getStatsByBHID = (
 	brawlhallaId: number,
 ): Promise<AxiosResponse<PlayerStats>> =>
 	request.get<PlayerStats>(`player/${brawlhallaId}/stats`);
 
+/**
+ * Get player stats by name
+ *
+ * @param {string} name Player name
+ * @returns {Promise<AxiosResponse<PlayerStats>>} Player stats
+ */
 export const getStatsByName = async (name: string) => {
 	const brawlhallaId = await getBHIDFromName(name);
 
 	return getStatsByBHID(brawlhallaId);
 };
 
+/**
+ * Get player ranked stats by Brawlhalla ID
+ *
+ * @param {number} brawlhallaId Brawlhalla ID of the player
+ * @returns {Promise<AxiosResponse<PlayerRanked>>} Player ranked stats
+ */
 export const getRankedByBHID = (
 	brawlhallaId: number,
 ): Promise<AxiosResponse<PlayerRanked>> =>
 	request.get<PlayerRanked>(`player/${brawlhallaId}/ranked`);
 
+/**
+ * Get clan by ID
+ *
+ * @param {number} clanID Brawlhalla clan ID
+ * @returns {Promise<AxiosResponse<Clan>>} Clan data
+ */
 export const getClanByID = (clanID: number): Promise<AxiosResponse<Clan>> =>
 	request.get<Clan>(`clan/${clanID}`);
 
+/**
+ * Get all legends
+ *
+ * @returns {Promise<AxiosResponse<StaticAllLegends[]>>} All legends
+ */
 export const getAllLegends = async (): Promise<
 	AxiosResponse<StaticAllLegends[]>
 > => request.get<StaticAllLegends[]>("legends/all");
 
+/**
+ * Get legend by ID
+ *
+ * @param {number} legendID Brawlhalla legend ID
+ * @returns {Promise<AxiosResponse<StaticLegend>>} Legend data
+ */
 export const getLegendByID = async (
 	legendID: number,
 ): Promise<AxiosResponse<StaticLegend>> =>
 	request.get<StaticLegend>(`legends/${legendID}`);
 
+/**
+ * Get legend by name
+ *
+ * @param {string} name Legend name
+ * @returns {Promise<AxiosResponse<StaticLegend>>} Legend data
+ */
 export const getLegendByName = async (
 	name: string,
 ): Promise<AxiosResponse<StaticLegend>> => {
@@ -127,6 +174,12 @@ export const getLegendByName = async (
 	return getLegendByID(legend.legend_id);
 };
 
+/**
+ * Get glory data by Brawlhalla ID
+ *
+ * @param {number} brawlhallaId Brawlhalla ID of the player
+ * @returns {Promise<GloryData>} Glory data
+ */
 export const getGloryByBHID = async (
 	brawlhallaId: number,
 ): Promise<GloryData> => {
@@ -158,6 +211,12 @@ export const getGloryByBHID = async (
 	};
 };
 
+/**
+ * Get player rankings
+ *
+ * @param {RankingsOptions<RankingTypes>} rankingOptions Ranking options
+ * @returns {Promise<AxiosResponse<RankingResponse<RankingTypes>>>} Player rankings
+ */
 export const getRankings = async <T extends RankingTypes>({
 	page,
 	region,

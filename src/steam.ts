@@ -67,15 +67,33 @@ const getSteamData = async (url: string): Promise<SteamData> => {
 		});
 };
 
+/**
+ * Get Steam data by profile URL
+ *
+ * @param {string} steamProfileURL Steam profile URL
+ * @returns {Promise<SteamData>} Promise resolving to the Steam data
+ */
 export const getSteamDataByURL = async (
 	steamProfileURL: string,
 ): Promise<SteamData> => getSteamData(steamProfileURL);
 
+/**
+ * Get Steam data by Steam ID
+ *
+ * @param {string} steamID Steam ID
+ * @returns {Promise<SteamData>} Promise resolving to the Steam data
+ */
 export const getSteamDataBySteamID = async (
 	steamID: string,
 ): Promise<SteamData> =>
 	getSteamData("https://steamcommunity.com/profiles/" + steamID);
 
+/**
+ * Get Brawlhalla ID from Steam ID
+ *
+ * @param {string} steamID Steam ID
+ * @returns {Promise<number>} Promise resolving to the Brawlhalla ID
+ */
 export const getBHIDFromSteamID = async (steamID: string): Promise<number> => {
 	const { data } = await request.get<PlayerStats[]>("search", {
 		params: {
@@ -93,6 +111,12 @@ export const getBHIDFromSteamID = async (steamID: string): Promise<number> => {
 	return data[0].brawlhalla_id;
 };
 
+/**
+ * Get Brawlhalla ID from Steam profile URL
+ *
+ * @param {string} steamProfileURL Steam profile URL
+ * @returns {Promise<number>} Promise resolving to the Brawlhalla ID
+ */
 export const getBHIDFromSteamURL = async (
 	steamProfileURL: string,
 ): Promise<number> => {
@@ -101,36 +125,72 @@ export const getBHIDFromSteamURL = async (
 	return getBHIDFromSteamID(steamData.steam_id);
 };
 
+/**
+ * Get Brawlhalla stats by Steam ID
+ *
+ * @param {string} steamID Steam ID
+ * @returns {Promise<BrawlhallaStats>} Promise resolving to the Brawlhalla stats
+ */
 export const getStatsBySteamID = async (steamID: string) => {
 	const brawlhallaId = await getBHIDFromSteamID(steamID);
 
 	return getStatsByBHID(brawlhallaId);
 };
 
+/**
+ * Get Brawlhalla stats by Steam profile URL
+ *
+ * @param {string} steamProfileURL Steam profile URL
+ * @returns {Promise<BrawlhallaStats>} Promise resolving to the Brawlhalla stats
+ */
 export const getStatsBySteamURL = async (steamProfileURL: string) => {
 	const brawlhallaId = await getBHIDFromSteamURL(steamProfileURL);
 
 	return getStatsByBHID(brawlhallaId);
 };
 
+/**
+ * Get Brawlhalla ranked data by Steam ID
+ *
+ * @param {string} steamID Steam ID
+ * @returns {Promise<BrawlhallaRankedData>} Promise resolving to the Brawlhalla ranked data
+ */
 export const getRankedBySteamID = async (steamID: string) => {
 	const brawlhallaId = await getBHIDFromSteamID(steamID);
 
 	return getRankedByBHID(brawlhallaId);
 };
 
+/**
+ * Get Brawlhalla ranked data by Steam profile URL
+ *
+ * @param {string} steamProfileURL Steam profile URL
+ * @returns {Promise<BrawlhallaRankedData>} Promise resolving to the Brawlhalla ranked data
+ */
 export const getRankedBySteamURL = async (steamProfileURL: string) => {
 	const brawlhallaId = await getBHIDFromSteamURL(steamProfileURL);
 
 	return getRankedByBHID(brawlhallaId);
 };
 
+/**
+ * Get Brawlhalla glory by Steam ID
+ *
+ * @param {string} steamID Steam ID
+ * @returns {Promise<number>} Promise resolving to the Brawlhalla glory
+ */
 export const getGloryFromSteamID = async (steamID: string) => {
 	const brawlhallaId = await getBHIDFromSteamID(steamID);
 
 	return getGloryByBHID(brawlhallaId);
 };
 
+/**
+ * Get Brawlhalla glory by Steam profile URL
+ *
+ * @param {string} steamProfileURL Steam profile URL
+ * @returns {Promise<number>} Promise resolving to the Brawlhalla glory
+ */
 export const getGloryFromSteamURL = async (steamProfileURL: string) => {
 	const brawlhallaId = await getBHIDFromSteamURL(steamProfileURL);
 

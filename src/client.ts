@@ -4,19 +4,7 @@ import axios, {
 	AxiosRequestConfig,
 	AxiosResponse,
 } from "axios";
-import { BHAPIError } from "./types";
-
-export type QueueItem = {
-	config: AxiosRequestConfig;
-	path: string;
-	resolve: (value: AxiosResponse) => void;
-	reject: (reason?: any) => void;
-};
-
-export type CustomError = Error & {
-	retryAfterMs: number;
-	isRateLimitError: boolean;
-};
+import { BHAPIError, QueueItem } from "./types";
 
 let API_KEY: string | null = null;
 const MAX_CALLS_PER_SECOND = 10;
@@ -25,6 +13,9 @@ const MAX_QUEUE_LENGTH = 500;
 let requestQueue: QueueItem[] = [];
 let activeRequests = 0;
 
+/**
+ * Axios instance for Brawlhalla API. USE `bhapi.request` EXPORTS FOR CUSTOM REQUESTS
+ */
 export const apiClient: AxiosInstance = axios.create({
 	baseURL: "https://api.brawlhalla.com/",
 	timeout: 10000,
@@ -117,22 +108,61 @@ const queuedRequest = <T>(
 		else requestQueue.push({ config, path, resolve, reject });
 	});
 
+/**
+ * Set the API key for authentication
+ *
+ * @param {string} key Brawlhalla API key
+ * @returns {string} The API key that was set
+ */
 export function setApiKey(key: string) {
 	API_KEY = key;
 
 	return key;
 }
 
+/**
+ * Request methods for Brawlhalla API
+ */
 export const request = {
+	/**
+	 * Send a GET request to the Brawlhalla API
+	 *
+	 * @param {string} path API endpoint path
+	 * @param {AxiosRequestConfig} config Axios request configuration
+	 * @returns {Promise<AxiosResponse<T>>} Promise resolving to the API response
+	 */
 	get: <T>(path: string, config?: AxiosRequestConfig) =>
 		queuedRequest<T>(path, { method: "get", ...config }),
 
+	/**
+	 * Send a POST request to the Brawlhalla API
+	 *
+	 * @param {string} path API endpoint path
+	 * @param {any} data Request payload
+	 * @param {AxiosRequestConfig} config Axios request configuration
+	 * @returns {Promise<AxiosResponse<T>>} Promise resolving to the API response
+	 */
 	post: <T>(path: string, data?: any, config?: AxiosRequestConfig) =>
 		queuedRequest<T>(path, { method: "post", data, ...config }),
 
+	/**
+	 * Send a PUT request to the Brawlhalla API
+	 *
+	 * @param {string} path API endpoint path
+	 * @param {any} data Request payload
+	 * @param {AxiosRequestConfig} config Axios request configuration
+	 * @returns {Promise<AxiosResponse<T>>} Promise resolving to the API response
+	 */
 	put: <T>(path: string, data?: any, config?: AxiosRequestConfig) =>
 		queuedRequest<T>(path, { method: "put", data, ...config }),
 
+	/**
+	 * Send a DELETE request to the Brawlhalla API
+	 *
+	 * @param {string} path API endpoint path
+	 * @param {AxiosRequestConfig} config Axios request configuration
+	 * @returns {Promise<AxiosResponse<T>>} Promise resolving to the API response
+	 */
 	delete: <T>(path: string, config?: AxiosRequestConfig) =>
 		queuedRequest<T>(path, { method: "delete", ...config }),
 };
